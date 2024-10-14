@@ -4,18 +4,15 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
-
 
 # 读取训练集和测试集
-train_df = pd.read_csv('Train_set/Playground_data_200_train_set.csv')  # 替换为你的训练集文件名
-test_df = pd.read_csv('Test_set/Playground_data_200_test_set.csv')    # 替换为你的测试集文件名
+train_df = pd.read_csv('Train_set/Parking_lot_data_200_train_set.csv')
+test_df = pd.read_csv('Test_set/Parking_lot_data_200_test_set.csv')
 
 # 假设前10列是特征，最后一列是标签
-X_train = train_df.iloc[:, :-1].values
+X_train = train_df.iloc[:, :4].values
 y_train = train_df.iloc[:, -1].values
-X_test = test_df.iloc[:, :-1].values
+X_test = test_df.iloc[:, :4].values
 y_test = test_df.iloc[:, -1].values
 
 # 将数据转换为 PyTorch 张量
@@ -49,7 +46,7 @@ class MLP(nn.Module):
 # 超参数
 input_size = X_train.shape[1]  # 特征数量
 hidden_size = 64                 # 隐藏层神经元数量
-num_epochs = 200
+num_epochs = 400
 learning_rate = 0.001
 
 # 实例化模型、损失函数和优化器
@@ -85,21 +82,8 @@ plt.plot([i for i in range(1,12)], [i+1 for i in range(1,12)], linestyle='--', c
 plt.plot([i for i in range(1,12)], [i-1 for i in range(1,12)], linestyle='--', c = 'y')
 plt.show()
 
-error = np.abs(y_test_tensor - test_outputs.reshape(110,))
-sorted_data = np.sort(error)
-cdf = np.arange(1, len(sorted_data) + 1) / len(sorted_data)
-error = pd.DataFrame({'Playground': error})
-
-plt.figure()
-sns.ecdfplot(data=error, legend=True)
-plt.title('Cumulative Distribution Function (CDF)')
-plt.xlabel('Value')
-plt.ylabel('CDF')
-plt.grid()
-plt.show()
-
 commend = input('Save model or not? (y/n)')
 if commend == 'y':
-    torch.save(model, 'Models/Playground_model_10.pth') #10 is the number of features
+    torch.save(model, 'Models/Parking_lot_model_4.pth') #10 is the number of features
 else:
     print('not save')

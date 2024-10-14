@@ -9,12 +9,16 @@ import seaborn as sns
 
 
 # 读取训练集和测试集
-train_df = pd.read_csv('Train_set/Playground_data_200_train_set.csv')  # 替换为你的训练集文件名
+train_df_1 = pd.read_csv('Train_set/Playground_data_200_train_set.csv')  # 替换为你的训练集文件名
+train_df_2 = pd.read_csv('Train_set/Office_data_200_train_set.csv')  # 替换为你的训练集文件名
+train_df_3 = pd.read_csv('Train_set/Parking_lot_data_200_train_set.csv')
+train_df = pd.concat([train_df_1, train_df_2, train_df_3])
 test_df = pd.read_csv('Test_set/Playground_data_200_test_set.csv')    # 替换为你的测试集文件名
 
 # 假设前10列是特征，最后一列是标签
 X_train = train_df.iloc[:, :-1].values
 y_train = train_df.iloc[:, -1].values
+
 X_test = test_df.iloc[:, :-1].values
 y_test = test_df.iloc[:, -1].values
 
@@ -26,7 +30,7 @@ y_test_tensor = torch.FloatTensor(y_test)
 
 # 创建 TensorDataset 和 DataLoader
 train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
 
 # 定义 MLP 模型
 class MLP(nn.Module):
@@ -48,8 +52,8 @@ class MLP(nn.Module):
 
 # 超参数
 input_size = X_train.shape[1]  # 特征数量
-hidden_size = 64                 # 隐藏层神经元数量
-num_epochs = 200
+hidden_size = 256                 # 隐藏层神经元数量
+num_epochs = 600
 learning_rate = 0.001
 
 # 实例化模型、损失函数和优化器
