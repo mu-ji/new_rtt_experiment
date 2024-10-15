@@ -104,6 +104,6 @@ plt.show()
 
 commend = input('Save model or not? (y/n)')
 if commend == 'y':
-    torch.save(model, 'Models/Playground_model_10.pth') #10 is the number of features
+    torch.save(model, 'Models/Multi_model_10.pth') #10 is the number of features
 else:
     print('not save')

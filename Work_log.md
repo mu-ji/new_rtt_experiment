@@ -6,3 +6,4 @@ But with larger n, the energy consumption and cost time will become larger. If t
 Assume the speed of target is v, the measurement time is n*tau where tau is the interval between two packet. 
 To make a resonable position estimation, the moving distance of the target should smaller than the resolution, i.e.
 n*tau*v <= 9/n i.e. v*n^2*tau <= 9 This equation limited the upper bound of n
+
