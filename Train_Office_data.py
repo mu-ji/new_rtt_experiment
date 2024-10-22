@@ -12,9 +12,9 @@ train_df = pd.read_csv('Train_set/Office_data_200_train_set.csv')
 test_df = pd.read_csv('Test_set/Office_data_200_test_set.csv')
 
 # 假设前10列是特征，最后一列是标签
-X_train = train_df.iloc[:, :4].values
+X_train = train_df.iloc[:, :2].values
 y_train = train_df.iloc[:, -1].values
-X_test = test_df.iloc[:, :4].values
+X_test = test_df.iloc[:, :2].values
 y_test = test_df.iloc[:, -1].values
 
 # 将数据转换为 PyTorch 张量
@@ -31,24 +31,32 @@ train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.elu = nn.ELU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.elu = nn.ELU()
-        self.fc3 = nn.Linear(hidden_size, 1)  # 输出层只有一个神经元
+        self.fc1 = nn.Linear(input_size, 256)
+        self.tanh = nn.Tanh()
+        self.fc2 = nn.Linear(256, 128)
+        self.tanh = nn.Tanh()
+        self.fc3 = nn.Linear(128, 64)
+        self.tanh = nn.Tanh()
+        self.fc4 = nn.Linear(64, 32)
+        self.tanh = nn.Tanh()
+        self.fc5 = nn.Linear(32, 1)  # 输出层只有一个神经元
 
     def forward(self, x):
         x = self.fc1(x)
-        x = self.elu(x)
+        x = self.tanh(x)
         x = self.fc2(x)
-        x = self.elu(x)
+        x = self.tanh(x)
         x = self.fc3(x)
+        x = self.tanh(x)
+        x = self.fc4(x)
+        x = self.tanh(x)
+        x = self.fc5(x)
         return x
 
 # 超参数
 input_size = X_train.shape[1]  # 特征数量
 hidden_size =128                 # 隐藏层神经元数量
-num_epochs = 600
+num_epochs = 300
 learning_rate = 0.001
 
 # 实例化模型、损失函数和优化器
@@ -99,6 +107,6 @@ plt.show()
 
 commend = input('Save model or not? (y/n)')
 if commend == 'y':
-    torch.save(model, 'Models/Office_model_4.pth') #10 is the number of features
+    torch.save(model, 'Models/Office_model_2.pth') #10 is the number of features
 else:
     print('not save')

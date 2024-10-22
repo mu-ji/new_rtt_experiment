@@ -25,28 +25,35 @@ y_test_tensor = torch.FloatTensor(y_test)
 train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-# 定义 MLP 模型
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.elu = nn.ELU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.elu = nn.ELU()
-        self.fc3 = nn.Linear(hidden_size, 1)  # 输出层只有一个神经元
+        self.fc1 = nn.Linear(input_size, 256)
+        self.tanh = nn.Tanh()
+        self.fc2 = nn.Linear(256, 128)
+        self.tanh = nn.Tanh()
+        self.fc3 = nn.Linear(128, 64)
+        self.tanh = nn.Tanh()
+        self.fc4 = nn.Linear(64, 32)
+        self.tanh = nn.Tanh()
+        self.fc5 = nn.Linear(32, 1)  # 输出层只有一个神经元
 
     def forward(self, x):
         x = self.fc1(x)
-        x = self.elu(x)
+        x = self.tanh(x)
         x = self.fc2(x)
-        x = self.elu(x)
+        x = self.tanh(x)
         x = self.fc3(x)
+        x = self.tanh(x)
+        x = self.fc4(x)
+        x = self.tanh(x)
+        x = self.fc5(x)
         return x
 
 # 超参数
 input_size = X_train.shape[1]  # 特征数量
 hidden_size = 64                 # 隐藏层神经元数量
-num_epochs = 400
+num_epochs = 100
 learning_rate = 0.001
 
 # 实例化模型、损失函数和优化器

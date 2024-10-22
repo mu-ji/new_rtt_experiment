@@ -10,18 +10,26 @@ import seaborn as sns
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size):
         super(MLP, self).__init__()
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.elu = nn.ELU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.elu = nn.ELU()
-        self.fc3 = nn.Linear(hidden_size, 1)  # 输出层只有一个神经元
+        self.fc1 = nn.Linear(input_size, 256)
+        self.tanh = nn.Tanh()
+        self.fc2 = nn.Linear(256, 128)
+        self.tanh = nn.Tanh()
+        self.fc3 = nn.Linear(128, 64)
+        self.tanh = nn.Tanh()
+        self.fc4 = nn.Linear(64, 32)
+        self.tanh = nn.Tanh()
+        self.fc5 = nn.Linear(32, 1)  # 输出层只有一个神经元
 
     def forward(self, x):
         x = self.fc1(x)
-        x = self.elu(x)
+        x = self.tanh(x)
         x = self.fc2(x)
-        x = self.elu(x)
+        x = self.tanh(x)
         x = self.fc3(x)
+        x = self.tanh(x)
+        x = self.fc4(x)
+        x = self.tanh(x)
+        x = self.fc5(x)
         return x
     
 Multi_model_10 = torch.load('Models/Multi_model_10.pth')
@@ -114,7 +122,7 @@ sns.ecdfplot(data=result, legend=True)
 plt.ylabel('Propotion')
 plt.xlabel('Estimation Error(m)')
 plt.grid()
-plt.savefig('Figures/Multi_train_all_data_CDF.png')
+plt.savefig('Figures/Multi_train_all_data_CDF.svg',dpi=1000,format='svg')
 plt.show()
 
 

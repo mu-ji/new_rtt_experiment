@@ -14,34 +14,16 @@ sample_number_per_distance_test = 10
 def generate_samples(start_index, rtt_data, rssi_data, sample_length):
     rtt_data = rtt_data[start_index:start_index+sample_length]
     rssi_data = rssi_data[start_index:start_index+sample_length]
-
-    rtt_mean = np.mean(rtt_data)
-    for i in range(len(rtt_data)):
-        if rtt_data[i] - rtt_mean >= 1:
-            rtt_data[i] = rtt_mean + 1
-        if rtt_data[i] - rtt_mean <= -1:
-            rtt_data[i] = rtt_mean - 1
-
-    rtt_mean = np.mean(rtt_data)
     # add gmm selection, only return a distribution after GMM
-    return np.array([rtt_mean, np.var(rtt_data), np.mean(rssi_data), np.var(rssi_data)])
+    return np.array([rtt_data, rssi_data]).reshape(-1)
 
 def update_train_set(train_set, sample, label):
-    train_set['rtt_mean'].append(sample[0])
-    train_set['rtt_var'].append(sample[1])
-    train_set['rssi_mean'].append(sample[2])
-    train_set['rssi_var'].append(sample[3])
-    train_set['label'].append(label)
+    train_set.append(np.append(sample,label))
+
     return train_set
 
 def generate_train_set(folder_name, distance_list, sample_length, sample_number_per_distance):
-    train_set = {
-        'rtt_mean': [],
-        'rtt_var': [],
-        'rssi_mean': [],
-        'rssi_var': [],
-        'label': []
-    }
+    train_set = []
     for distance in distance_list:
         distance_data = np.load('{}/{}_distance_{}.npz'.format(folder_name, folder_name, distance))
         distance_rtt_data = distance_data['rtt_data']
@@ -53,13 +35,7 @@ def generate_train_set(folder_name, distance_list, sample_length, sample_number_
     return train_set
 
 def generate_test_set(folder_name, distance_list, sample_length, sample_number_per_distance_test):
-    test_set = {
-        'rtt_mean': [],
-        'rtt_var': [],
-        'rssi_mean': [],
-        'rssi_var': [],
-        'label': []
-    }
+    test_set = []
     for distance in distance_list:
         distance_data = np.load('{}/{}_distance_{}.npz'.format(folder_name, folder_name, distance))
         distance_rtt_data = distance_data['rtt_data']

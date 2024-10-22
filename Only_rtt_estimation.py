@@ -12,7 +12,7 @@ test_df = pd.read_csv('Test_set/Office_data_200_test_set.csv')    # 替换为你
 
 rtt_mean = test_df.iloc[:, 0]
 y_test = test_df.iloc[:, -1]
-estimation = [(i-1.1)*299792458/(16000000*2) for i in rtt_mean]
+estimation = [(i-1.5)*299792458/(16000000*2) for i in rtt_mean]
 
 plt.figure()
 plt.scatter(y_test, estimation)
