@@ -5,9 +5,9 @@ import random
 import pandas as pd
 
 packet_number = 30000
-folder_name = 'Playground_data'
+folder_name = 'Office_data'
 distance_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-sample_length = 200
+sample_length = 300
 sample_number_per_distance = 80
 sample_number_per_distance_test = 10
 

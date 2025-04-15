@@ -87,8 +87,8 @@ Office_outputs_2 = model_predict(Office_model_2, Office_test_x_2)
 Office_outputs_4 = model_predict(Office_model_4, Office_test_x_4)
 Office_outputs_10 = model_predict(Office_model_10, Office_test_x_10)
 
-rect_with_GMM = plt.Rectangle((0, 0), 1, 1, facecolor='skyblue')
-rect_without_GMM = plt.Rectangle((0, 0), 1, 1, facecolor='coral')
+rect_without_GMM = plt.Rectangle((0, 0), 1, 1, facecolor='skyblue')
+rect_with_GMM = plt.Rectangle((0, 0), 1, 1, facecolor='coral')
 error_bond = plt.Line2D((0, 1), (0, 1), color='y',linestyle='--')
 groundtruth = plt.Line2D((0, 1), (0, 1), color='black')
 
@@ -100,11 +100,11 @@ plt.plot([i for i in range(1,12)], [i+1 for i in range(1,12)], linestyle='--', c
 plt.plot([i for i in range(1,12)], [i-1 for i in range(1,12)], linestyle='--', c = 'y')
 plt.grid()
 plt.legend()
-plt.xlabel('Distance (m)', fontdict={'weight': 'normal', 'size': 15})
-plt.ylabel('Prediction Distance (m)', fontdict={'weight': 'normal', 'size': 15})
+plt.xlabel('Distance (m)', fontdict={'weight': 'normal', 'size': 12})
+plt.ylabel('Predicted Distance (m)', fontdict={'weight': 'normal', 'size': 12})
 plt.xlim(0,12)
 plt.ylim(0,12)
-plt.legend([rect_with_GMM, rect_without_GMM,error_bond, groundtruth], ['ML-based RTT+RSSI\n Ranging with GMM', 'ML-based RTT+RSSI\n Ranging', '+/-1 m Error_boundray', 'True Distance'])
+plt.legend([rect_without_GMM, rect_with_GMM,error_bond, groundtruth], ['ML-based RTT+RSSI\n Ranging', 'ML-based RTT+RSSI\n Ranging with GMM', '+/-1 m Error boundray', 'True Distance'])
 plt.rcParams.update({'font.size': 10})
 plt.savefig('Figures/Office_results.svg',dpi=1000,format='svg')
 plt.show()
@@ -128,11 +128,10 @@ plt.ylim(0,12)
 plt.savefig('Figures/Parking_lot_results.png')
 plt.show()
 
-def draw_cdf(outputs_4, outputs_10, test_y, data_name):
+def draw_cdf(outputs_4, test_y, data_name):
     test_y = torch.FloatTensor(test_y)
     error_4 = np.abs((test_y - outputs_4).detach().numpy())
-    error_10 = np.abs((test_y - outputs_10).detach().numpy())
-    error_df = pd.DataFrame({'{}_without_GMM'.format(data_name): error_4, '{}_with_GMM'.format(data_name): error_10})
+    error_df = pd.DataFrame({'{}'.format(data_name): error_4})
     return error_df
 
 def cal_error(outputs,test_y):
@@ -140,7 +139,55 @@ def cal_error(outputs,test_y):
     error = np.abs((test_y - outputs).detach().numpy())
     return np.mean(error)
 
-Playground_df = draw_cdf(Playground_outputs_4, Playground_outputs_10, Playground_test_y, 'Playground')
+Playground_with_GMM = draw_cdf(Playground_outputs_10, Playground_test_y, 'Playground_with_GMM')
+Playground_without_GMM = draw_cdf(Playground_outputs_4, Playground_test_y, 'Playground_without_GMM')
+
+Parking_lot_with_GMM = draw_cdf(Parking_lot_outputs_10, Parking_lot_test_y, 'Parking_lot_with_GMM')
+Parking_lot_without_GMM = draw_cdf(Parking_lot_outputs_4, Parking_lot_test_y, 'Parking_lot_without_GMM')
+
+Office_with_GMM = draw_cdf(Office_outputs_10, Office_test_y, 'Office_with_GMM')
+Office_without_GMM = draw_cdf(Office_outputs_4, Office_test_y, 'Office_without_GMM')
+
+plt.figure()
+
+sns.ecdfplot(data=Playground_with_GMM, color = 'b', label = 'Playground_with_GMM')
+sns.ecdfplot(data=Playground_without_GMM, color = 'b', label = 'Playground_without_GMM', linestyle='--')
+
+sns.ecdfplot(data=Parking_lot_with_GMM, palette='Oranges', label = 'Parking_lot_with_GMM')
+sns.ecdfplot(data=Parking_lot_without_GMM, palette='Oranges', label = 'Parking_lot_without_GMM', linestyle='--')
+
+
+sns.ecdfplot(data=Office_with_GMM, palette = 'Greens', label = 'Office_with_GMM')
+sns.ecdfplot(data=Office_without_GMM, palette = 'Greens', label = 'Office_without_GMM', linestyle='--')
+
+label_offsets = [0, 0.04, 0.08, 0.12, 0.16, 0.2]  # Different vertical offsets for labels
+
+for i, (df, label) in enumerate(zip(
+    [Playground_with_GMM, Playground_without_GMM, 
+     Parking_lot_with_GMM, Parking_lot_without_GMM,
+     Office_with_GMM, Office_without_GMM],
+    ['Playground_with_GMM', 'Playground_without_GMM',
+     'Parking_lot_with_GMM', 'Parking_lot_without_GMM',
+     'Office_with_GMM', 'Office_without_GMM'])):
+    
+    error_values = df[label].values
+    error_80 = np.percentile(error_values, 80)
+    
+    # Draw a vertical line at the 80% error position
+    plt.axvline(x=error_80, linestyle='--', color='gray', alpha=0.5)
+    
+    # Place the error value on the x-axis with staggered positioning
+    y_offset = label_offsets[i]  # Use the corresponding offset
+    plt.text(error_80, y_offset, f'{error_80:.2f}', 
+             horizontalalignment='center', fontsize=9)
+    
+plt.ylabel('CDF', fontdict={'weight': 'normal', 'size': 12})
+plt.xlabel('Prediction Error(m)', fontdict={'weight': 'normal', 'size': 12})
+plt.grid()
+plt.legend()
+plt.savefig('Figures/All_data_CDF.svg',dpi=1000,format='svg')
+plt.show()
+'''
 Office_df = draw_cdf(Office_outputs_4, Office_outputs_10, Office_test_y, 'Office')
 Parking_lot_df = draw_cdf(Parking_lot_outputs_4, Parking_lot_outputs_10, Parking_lot_test_y, 'Parking_lot')
 
@@ -180,7 +227,7 @@ plt.violinplot([Playground_df['Playground_without_GMM'], Playground_df['Playgrou
              Parking_lot_df['Parking_lot_without_GMM'], Parking_lot_df['Parking_lot_with_GMM'],
              Office_df['Office_without_GMM'], Office_df['Office_with_GMM']], showextrema=True, showmedians= True)
 plt.show()
-
+'''
 Office_error_2 = np.abs(Office_outputs_2.detach().numpy() - Office_test_y)
 Office_error_4 = np.abs(Office_outputs_4.detach().numpy() - Office_test_y)
 Office_error_10 = np.abs(Office_outputs_10.detach().numpy() - Office_test_y)
@@ -190,13 +237,31 @@ Office_error_1 = np.abs(Office_error_1)
 plt.figure()
 plt.boxplot([Office_error_10, Office_error_4, Office_error_2, Office_error_1], showfliers=False)
 labels = ['ML-based \nRTT+RSSI\n Ranging with GMM', 'ML-based \nRTT+RSSI\n Ranging', 'ML-based RTT\n Ranging ', 'RTT-Ranging']
-plt.xticks([1, 2, 3, 4,], labels, fontdict={'weight': 'normal', 'size': 8})
+plt.xticks([1, 2, 3, 4,], labels, fontdict={'weight': 'normal', 'size': 9})
 plt.setp(plt.gca().get_xticklabels(), multialignment='center')
-plt.ylabel('Prediction Error(m)', fontdict={'weight': 'normal', 'size': 15})
+plt.ylabel('Prediction Error(m)', fontdict={'weight': 'normal', 'size': 12})
 plt.grid()
 plt.savefig('Figures/Different_ranging_methods.svg',dpi=300,format='svg')
 plt.show()
 
+Playground_error_4 = cal_error(Playground_outputs_4, Playground_test_y)
+Playground_error_10 = cal_error(Playground_outputs_10, Playground_test_y)
+
+Parking_lot_error_4 = cal_error(Parking_lot_outputs_4, Parking_lot_test_y)
+Parking_lot_error_10 = cal_error(Parking_lot_outputs_10, Parking_lot_test_y)
+
+Office_error_2 = cal_error(Office_outputs_2, Office_test_y)
+Office_error_4 = cal_error(Office_outputs_4, Office_test_y)
+Office_error_10 = cal_error(Office_outputs_10, Office_test_y)
+
+print('Playground error 4:', Playground_error_4)
+print('Playground error 10:', Playground_error_10)
+
+print('Parking_lot error 4:', Parking_lot_error_4)
+print('Parking_lot error 10:', Parking_lot_error_10)
+
+print('Office error 4:', Office_error_4)
+print('Office error 10:', Office_error_10)
 
 
 # 创建主图

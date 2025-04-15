@@ -118,10 +118,30 @@ Parking_lot_df = draw_cdf(Parking_lot_outputs_10, Parking_lot_test_y, 'Parking_l
 result = Playground_df.join(Office_df)
 result = result.join(Parking_lot_df)
 plt.figure()
-sns.ecdfplot(data=result, legend=True)
-plt.ylabel('Propotion')
-plt.xlabel('Estimation Error(m)')
+sns.ecdfplot(data=Playground_df, legend=True, color = 'b', label = 'Playground')
+sns.ecdfplot(data=Parking_lot_df, legend=True, palette='Oranges', label = 'Parking_lot')
+sns.ecdfplot(data=Office_df, legend=True, palette = 'Greens', label = 'Office')
+plt.ylabel('CDF', fontdict={'weight': 'normal', 'size': 12})
+
+datasets = [Playground_df, Office_df, Parking_lot_df]
+labels = ['Playground', 'Office', 'Parking_lot']
+label_offsets = [0, 0.04, 0.08]  # Different vertical offsets for labels
+
+for i, (df, label) in enumerate(zip(datasets, labels)):
+    error_values = df[label].values
+    error_80 = np.percentile(error_values, 80)
+    
+    # Draw a vertical line at the 80% error position
+    plt.axvline(x=error_80, linestyle='--', color='gray', alpha=0.5)
+    
+    # Place the error value on the x-axis with staggered positioning
+    y_offset = label_offsets[i]  # Use the corresponding offset
+    plt.text(error_80, y_offset, f'{error_80:.2f}', 
+             horizontalalignment='center', fontsize=9)
+    
+plt.xlabel('Prediction Error(m)', fontdict={'weight': 'normal', 'size': 12})
 plt.grid()
+plt.legend()
 plt.savefig('Figures/Multi_train_all_data_CDF.svg',dpi=1000,format='svg')
 plt.show()
 
