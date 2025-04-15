@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pylab as plt
 import time
 
-ser = serial.Serial('COM7', 115200)
+ser = serial.Serial('COM14', 115200)
 
 times = 0
 itration = 10000            #30000 for normal           10000 for test
@@ -45,4 +45,4 @@ if len(all_data['rtt_data']) == itration:
     all_data['rtt_data'] = np.array(all_data['rtt_data'])
     all_data['rssi_data'] = np.array(all_data['rssi_data'])
 
-    np.savez('Office2/Office2_data_distance_11.npz', **all_data)
+    np.savez('Office2/Office2_data_distance_8.npz', **all_data)
